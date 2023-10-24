@@ -78,9 +78,12 @@
             // Convert the image to base64 data URL
             const imageDataURL = canvas.toDataURL('image/jpeg');
 
+            // Generate a unique filename using the current timestamp
+            const timestamp = Date.now();
+            const imageName = `image_${timestamp}.jpg`;
+
             // Upload the image to Firebase Storage
             const storageRef = firebase.storage().ref();
-            const imageName = 'captured-image.jpg';
             const imageRef = storageRef.child(imageName);
             const metadata = {
                 contentType: 'image/jpeg'

